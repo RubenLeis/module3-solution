@@ -10,15 +10,11 @@ angular.module('NarrowItDownApp', [])
 NarrowItDownController.$inject = ['MenuSearchService'];
 function NarrowItDownController(MenuSearchService) {
   var narrowItCtrl = this;
-
-  narrowItCtrl.searchTerm='hola';
   
-  narrowItCtrl.narrowItDown = function (description) {
-	console.log("button narrowItDown pressed");
-    var promise = MenuSearchService.getMatchedMenuItems(description);
-
+  narrowItCtrl.narrowItDown = function (searchTerm) {
+    var promise = MenuSearchService.getMatchedMenuItems(searchTerm);
     promise.then(function (response) {
-	  narrowItCtrl.items = response.data.menu_items;
+	  narrowItCtrl.found = response;
     })
     .catch(function (error) {
       console.log(error);
@@ -27,50 +23,34 @@ function NarrowItDownController(MenuSearchService) {
 
 }
 
-
-    /*
-	  var menuItemsLength = response.data.menu_items.length;
-	  console.log("menuItemsLength: " + menuItemsLength);
-	  for (var i = 0; i < menuItemsLength; i++) {
-		 var item = response.data.menu_items[i];
-		 console.log("item name: " + item.description);
-		 if (item.description.indexOf()) {
-			 items.push(item);
-		 }
-		 
-	  };
-	  */
-
+/**
+* Service to retrieve list item 
+*/
 MenuSearchService.$inject = ['$http', 'ApiBasePath'];
 function MenuSearchService($http, ApiBasePath) {
   var service = this;
 
-  service.getMatchedMenuItems = function (description) {
-	var response = $http({
+  /**
+  * Get list item that match to searchTerm
+  */
+  service.getMatchedMenuItems = function (searchTerm) {
+	return $http({
       method: "GET",
       url: (ApiBasePath + "/menu_items.json")
+    }).then(function (response) {
+		//Filtering the response items by searchTerm
+		var foundItems = [];
+		var menuItemsLength = response.data.menu_items.length;
+		//console.log("menuItemsLength: " + menuItemsLength);
+		for (var i = 0; i < menuItemsLength; i++) {
+			var item = response.data.menu_items[i];
+			if (item.description.indexOf(searchTerm) !== -1) {
+				//console.log("matched: " + item.description + " == " + searchTerm);
+				foundItems.push(item);
+			}
+		};
+		return foundItems;
     });
-	console.log("match " + description);
-	console.log(response.data.menu_items);
-    return response;
-	
-	/*
-	var foundItems = [];
-	console.log(response.menu_items);
-	var menuItemsLength = response.menu_items.length;
-	console.log("menuItemsLength: " + menuItemsLength);
-    for (var i = 0; i < menuItemsLength; i++) {
-		var item = response.menu_items[i];
-		console.log("item name: " + item.description);
-		if (item.description.indexOf(description)) {
-			console.log("matched");
-			foundItems.push(item);
-		}
-		 
-	};
-	return foundItems;
-	*/
-	
   };
 
 }
