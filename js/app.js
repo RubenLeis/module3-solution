@@ -13,8 +13,8 @@ function FoundItemsDirective() {
     templateUrl: 'foundItems.html',
     scope: {
       items: '<',
-	  myTitle: '@title'
-      //onRemove: '&'
+	  myTitle: '@title',
+      onRemove: '&'
     },
     controller: FoundItemsDirectiveController,
     controllerAs: 'list',
@@ -56,6 +56,13 @@ function NarrowItDownController(MenuSearchService) {
     .catch(function (error) {
       console.log(error);
     })
+  };
+  
+  narrowItCtrl.removeItem = function (itemIndex) {
+    console.log("'this' is: ", this);
+    this.lastRemoved = "Last item removed was " + narrowItCtrl.found[itemIndex].name;
+	console.log("lastRemoved: " + this.lastRemoved);
+    narrowItCtrl.found.splice(itemIndex, 1);
   };
 
 }
