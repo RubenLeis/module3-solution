@@ -1,8 +1,7 @@
-<h3>Title: {{list.myTitle}}</h3>
 <ul>
 	<li ng-repeat="item in list.items">
 		{{item.name}} , {{item.short_name}} , {{item.description}}
-		<!--<button class="btn btn-default" ng-click="toBuyCtrl.bought($index);"><span class="glyphicon glyphicon-ok"></span> Bought</button>-->
 		<button class="btn btn-warning" ng-click="list.onRemove({index: $index});">Don't want this one!</button>
 	</li>
+	<div class="alert alert-info" ng-if="list.checkFoundList()">Nothing found</div>
 <ul>

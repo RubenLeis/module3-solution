@@ -1,3 +1,9 @@
+/**
+* Author: Ruben Leis
+* https://github.com/jhu-ep-coursera/fullstack-course5/blob/master/assignments/assignment3/Assignment-3.md
+*
+*/
+
 (function () {
 'use strict';
 
@@ -7,13 +13,12 @@ angular.module('NarrowItDownApp', [])
 .constant('ApiBasePath', "https://davids-restaurant.herokuapp.com")
 .directive('foundItems', FoundItemsDirective);
 
-
+//DIRECTIVES ***********************************************************
 function FoundItemsDirective() {
   var ddo = {
     templateUrl: 'foundItems.html',
     scope: {
       items: '<',
-	  myTitle: '@title',
       onRemove: '&'
     },
     controller: FoundItemsDirectiveController,
@@ -26,49 +31,49 @@ function FoundItemsDirective() {
 
 function FoundItemsDirectiveController() {
   var list = this;
-	/*
-  list.cookiesInList = function () {
-    for (var i = 0; i < list.items.length; i++) {
-      var name = list.items[i].name;
-      if (name.toLowerCase().indexOf("cookie") !== -1) {
-        return true;
-      }
-    }
 
-    return false;
+  //Returns true if list is empty
+  list.checkFoundList = function () {
+	return typeof list.items !== 'undefined' && list.items.length === 0
   };
-  */
 }
 
 
-
+//CONTROLLERS ***********************************************************
 NarrowItDownController.$inject = ['MenuSearchService'];
 function NarrowItDownController(MenuSearchService) {
   var narrowItCtrl = this;
   
-  narrowItCtrl.title = "Found List";
-  
+  //Search action
   narrowItCtrl.narrowItDown = function (searchTerm) {
-    var promise = MenuSearchService.getMatchedMenuItems(searchTerm);
-    promise.then(function (response) {
-	  narrowItCtrl.found = response;
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
+	//Search only when searchTerm is not empty
+	if (searchTerm) {
+		var promise = MenuSearchService.getMatchedMenuItems(searchTerm);
+		promise.then(function (response) {
+		  narrowItCtrl.found = response;
+		})
+		.catch(function (error) {
+		  console.log(error);
+		});
+	} else {
+		narrowItCtrl.found = [];
+	}
+	
   };
   
+  //Remove action
   narrowItCtrl.removeItem = function (itemIndex) {
-    console.log("'this' is: ", this);
     this.lastRemoved = "Last item removed was " + narrowItCtrl.found[itemIndex].name;
-	console.log("lastRemoved: " + this.lastRemoved);
+	//console.log("lastRemoved: " + this.lastRemoved);
     narrowItCtrl.found.splice(itemIndex, 1);
   };
 
 }
 
+
+//SERVICES ***********************************************************
 /**
-* Service to retrieve list item 
+* Service to retrieve menu items
 */
 MenuSearchService.$inject = ['$http', 'ApiBasePath'];
 function MenuSearchService($http, ApiBasePath) {
@@ -96,7 +101,6 @@ function MenuSearchService($http, ApiBasePath) {
 		return foundItems;
     });
   };
-
 }
 
 })();
